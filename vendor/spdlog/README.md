@@ -1,13 +1,6 @@
 # spdlog
 
- 
-[![ci](https://github.com/gabime/spdlog/actions/workflows/linux.yml/badge.svg)](https://github.com/gabime/spdlog/actions/workflows/linux.yml)&nbsp;
-[![ci](https://github.com/gabime/spdlog/actions/workflows/windows.yml/badge.svg)](https://github.com/gabime/spdlog/actions/workflows/windows.yml)&nbsp;
-[![ci](https://github.com/gabime/spdlog/actions/workflows/macos.yml/badge.svg)](https://github.com/gabime/spdlog/actions/workflows/macos.yml)&nbsp;
-[![Build status](https://ci.appveyor.com/api/projects/status/d2jnxclg20vd0o50?svg=true&branch=v1.x)](https://ci.appveyor.com/project/gabime/spdlog) [![Release](https://img.shields.io/github/release/gabime/spdlog.svg)](https://github.com/gabime/spdlog/releases/latest)
-
-Fast C++ logging library
-
+Very fast, header-only/compiled, C++ logging library. [![ci](https://github.com/gabime/spdlog/actions/workflows/ci.yml/badge.svg)](https://github.com/gabime/spdlog/actions/workflows/ci.yml)&nbsp; [![Build status](https://ci.appveyor.com/api/projects/status/d2jnxclg20vd0o50?svg=true&branch=v1.x)](https://ci.appveyor.com/project/gabime/spdlog) [![Release](https://img.shields.io/github/release/gabime/spdlog.svg)](https://github.com/gabime/spdlog/releases/latest)
 
 ## Install
 #### Header-only version
@@ -17,8 +10,9 @@ Copy the include [folder](https://github.com/gabime/spdlog/tree/v1.x/include/spd
 ```console
 $ git clone https://github.com/gabime/spdlog.git
 $ cd spdlog && mkdir build && cd build
-$ cmake .. && cmake --build .
+$ cmake .. && make -j
 ```
+
 see example [CMakeLists.txt](https://github.com/gabime/spdlog/blob/v1.x/example/CMakeLists.txt) on how to use.
 
 ## Platforms
@@ -37,7 +31,7 @@ see example [CMakeLists.txt](https://github.com/gabime/spdlog/blob/v1.x/example/
 * Arch Linux: `pacman -S spdlog`
 * openSUSE: `sudo zypper in spdlog-devel`
 * vcpkg: `vcpkg install spdlog`
-* conan: `conan install --requires=spdlog/[*]`
+* conan: `spdlog/[>=1.4.1]`
 * conda: `conda install -c conda-forge spdlog`
 * build2: ```depends: spdlog ^1.8.2```
 
@@ -86,8 +80,7 @@ int main()
     spdlog::set_pattern("[%H:%M:%S %z] [%n] [%^---%L---%$] [thread %t] %v");
     
     // Compile time log levels
-    // Note that this does not change the current log level, it will only
-    // remove (depending on SPDLOG_ACTIVE_LEVEL) the call on the release code.
+    // define SPDLOG_ACTIVE_LEVEL to desired level
     SPDLOG_TRACE("Some trace message with param {}", 42);
     SPDLOG_DEBUG("Some debug message");
 }
@@ -280,7 +273,6 @@ void async_example()
 ---
 #### Asynchronous logger with multi sinks
 ```c++
-#include "spdlog/async.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 #include "spdlog/sinks/rotating_file_sink.h"
 
@@ -303,7 +295,7 @@ struct fmt::formatter<my_type> : fmt::formatter<std::string>
 {
     auto format(my_type my, format_context &ctx) const -> decltype(ctx.out())
     {
-        return fmt::format_to(ctx.out(), "[my_type i={}]", my.i);
+        return format_to(ctx.out(), "[my_type i={}]", my.i);
     }
 };
 
@@ -444,22 +436,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     logger->info("Some info message");
 }
 ```
----
 
-#### Mapped Diagnostic Context
-```c++
-// Mapped Diagnostic Context (MDC) is a map that stores key-value pairs (string values) in thread local storage.
-// Each thread maintains its own MDC, which loggers use to append diagnostic information to log outputs.
-// Note: it is not supported in asynchronous mode due to its reliance on thread-local storage.
-#include "spdlog/mdc.h"
-void mdc_example()
-{
-    spdlog::mdc::put("key1", "value1");
-    spdlog::mdc::put("key2", "value2");
-    // if not using the default format, use the %& formatter to print mdc data
-    // spdlog::set_pattern("[%H:%M:%S %z] [%^%L%$] [%&] %v");
-}
-```
 ---
 ## Benchmarks
 

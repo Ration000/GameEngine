@@ -1,13 +1,13 @@
 /*
- * This content is released under the MIT License as specified in
- * https://raw.githubusercontent.com/gabime/spdlog/master/LICENSE
+ * This content is released under the MIT License as specified in https://raw.githubusercontent.com/gabime/spdlog/master/LICENSE
  */
 #include "includes.h"
 
 #define SIMPLE_LOG "test_logs/simple_log"
 #define ROTATING_LOG "test_logs/rotating_log"
 
-TEST_CASE("simple_file_logger", "[simple_logger]") {
+TEST_CASE("simple_file_logger", "[simple_logger]")
+{
     prepare_logdir();
     spdlog::filename_t filename = SPDLOG_FILENAME_T(SIMPLE_LOG);
 
@@ -20,11 +20,11 @@ TEST_CASE("simple_file_logger", "[simple_logger]") {
     logger->flush();
     require_message_count(SIMPLE_LOG, 2);
     using spdlog::details::os::default_eol;
-    REQUIRE(file_contents(SIMPLE_LOG) ==
-            spdlog::fmt_lib::format("Test message 1{}Test message 2{}", default_eol, default_eol));
+    REQUIRE(file_contents(SIMPLE_LOG) == spdlog::fmt_lib::format("Test message 1{}Test message 2{}", default_eol, default_eol));
 }
 
-TEST_CASE("flush_on", "[flush_on]") {
+TEST_CASE("flush_on", "[flush_on]")
+{
     prepare_logdir();
     spdlog::filename_t filename = SPDLOG_FILENAME_T(SIMPLE_LOG);
 
@@ -41,37 +41,18 @@ TEST_CASE("flush_on", "[flush_on]") {
     require_message_count(SIMPLE_LOG, 3);
     using spdlog::details::os::default_eol;
     REQUIRE(file_contents(SIMPLE_LOG) ==
-            spdlog::fmt_lib::format("Should not be flushed{}Test message 1{}Test message 2{}",
-                                    default_eol, default_eol, default_eol));
+            spdlog::fmt_lib::format("Should not be flushed{}Test message 1{}Test message 2{}", default_eol, default_eol, default_eol));
 }
 
-TEST_CASE("simple_file_logger", "[truncate]") {
-    prepare_logdir();
-    const spdlog::filename_t filename = SPDLOG_FILENAME_T(SIMPLE_LOG);
-    const bool truncate = true;
-    const auto sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(filename, truncate);
-    const auto logger = std::make_shared<spdlog::logger>("simple_file_logger", sink);
-
-    logger->info("Test message {}", 3.14);
-    logger->info("Test message {}", 2.71);
-    logger->flush();
-    REQUIRE(count_lines(SIMPLE_LOG) == 2);
-    
-    sink->truncate();
-    REQUIRE(count_lines(SIMPLE_LOG) == 0);
-
-    logger->info("Test message {}", 6.28);
-    logger->flush();
-    REQUIRE(count_lines(SIMPLE_LOG) == 1);
-}
-
-TEST_CASE("rotating_file_logger1", "[rotating_logger]") {
+TEST_CASE("rotating_file_logger1", "[rotating_logger]")
+{
     prepare_logdir();
     size_t max_size = 1024 * 10;
     spdlog::filename_t basename = SPDLOG_FILENAME_T(ROTATING_LOG);
     auto logger = spdlog::rotating_logger_mt("logger", basename, max_size, 0);
 
-    for (int i = 0; i < 10; ++i) {
+    for (int i = 0; i < 10; ++i)
+    {
         logger->info("Test message {}", i);
     }
 
@@ -79,7 +60,8 @@ TEST_CASE("rotating_file_logger1", "[rotating_logger]") {
     require_message_count(ROTATING_LOG, 10);
 }
 
-TEST_CASE("rotating_file_logger2", "[rotating_logger]") {
+TEST_CASE("rotating_file_logger2", "[rotating_logger]")
+{
     prepare_logdir();
     size_t max_size = 1024 * 10;
     spdlog::filename_t basename = SPDLOG_FILENAME_T(ROTATING_LOG);
@@ -87,7 +69,8 @@ TEST_CASE("rotating_file_logger2", "[rotating_logger]") {
     {
         // make an initial logger to create the first output file
         auto logger = spdlog::rotating_logger_mt("logger", basename, max_size, 2, true);
-        for (int i = 0; i < 10; ++i) {
+        for (int i = 0; i < 10; ++i)
+        {
             logger->info("Test message {}", i);
         }
         // drop causes the logger destructor to be called, which is required so the
@@ -96,7 +79,8 @@ TEST_CASE("rotating_file_logger2", "[rotating_logger]") {
     }
 
     auto logger = spdlog::rotating_logger_mt("logger", basename, max_size, 2, true);
-    for (int i = 0; i < 10; ++i) {
+    for (int i = 0; i < 10; ++i)
+    {
         logger->info("Test message {}", i);
     }
 
@@ -104,7 +88,9 @@ TEST_CASE("rotating_file_logger2", "[rotating_logger]") {
 
     require_message_count(ROTATING_LOG, 10);
 
-    for (int i = 0; i < 1000; i++) {
+    for (int i = 0; i < 1000; i++)
+    {
+
         logger->info("Test message {}", i);
     }
 
@@ -114,30 +100,10 @@ TEST_CASE("rotating_file_logger2", "[rotating_logger]") {
 }
 
 // test that passing max_size=0 throws
-TEST_CASE("rotating_file_logger3", "[rotating_logger]") {
+TEST_CASE("rotating_file_logger3", "[rotating_logger]")
+{
     prepare_logdir();
     size_t max_size = 0;
     spdlog::filename_t basename = SPDLOG_FILENAME_T(ROTATING_LOG);
-    REQUIRE_THROWS_AS(spdlog::rotating_logger_mt("logger", basename, max_size, 0),
-                      spdlog::spdlog_ex);
-}
-
-// test on-demand rotation of logs
-TEST_CASE("rotating_file_logger4", "[rotating_logger]") {
-    prepare_logdir();
-    size_t max_size = 1024 * 10;
-    spdlog::filename_t basename = SPDLOG_FILENAME_T(ROTATING_LOG);
-    auto sink = std::make_shared<spdlog::sinks::rotating_file_sink_st>(basename, max_size, 2);
-    auto logger = std::make_shared<spdlog::logger>("rotating_sink_logger", sink);
-
-    logger->info("Test message - pre-rotation");
-    logger->flush();
-
-    sink->rotate_now();
-
-    logger->info("Test message - post-rotation");
-    logger->flush();
-
-    REQUIRE(get_filesize(ROTATING_LOG) > 0);
-    REQUIRE(get_filesize(ROTATING_LOG ".1") > 0);
+    REQUIRE_THROWS_AS(spdlog::rotating_logger_mt("logger", basename, max_size, 0), spdlog::spdlog_ex);
 }

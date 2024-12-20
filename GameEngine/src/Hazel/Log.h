@@ -4,6 +4,9 @@
 
 #include"Core.h"
 #include"spdlog/spdlog.h"
+#include"spdlog/fmt/fmt.h"
+#include"spdlog/fmt/ostr.h"
+
 namespace Hazel
 {
 	class HAZEL_API Log
