@@ -1,7 +1,8 @@
-#pragma once
+ï»¿#pragma once
 
 #include"Hazel\Core.h"
 
+#include<iostream>
 #include<string>
 #include<functional>
 
@@ -26,9 +27,9 @@ namespace Hazel
 		EventCategoryMouseButton =BIT(4)
 	};
 
-#define EVENT_CLASS_TYPE(type) static EventType GetStaticType(){return EventType::##type;}/*·µ»ØtypeµÄEventTypeÀàĞÍµÄÖµ£¬ÈçEventType::KeyPressed*/\
+#define EVENT_CLASS_TYPE(type) static EventType GetStaticType(){return EventType::type;}/*è¿”å›typeçš„EventTypeç±»å‹çš„å€¼ï¼Œå¦‚EventType::KeyPressed*/\
 								virtual EventType GetEventType()const override{return GetStaticType();}\
-								virtual const char* GetName() const override{return #type;}/*·µ»ØtypeµÄstringÀàĞÍµÄÖµ£¬Èç"KeyPressed"*/
+								virtual const char* GetName() const override{return #type;}/*è¿”å›typeçš„stringç±»å‹çš„å€¼ï¼Œå¦‚"KeyPressed"*/
 
 #define EVENT_CLASS_CATEGORY(category) virtual int GetCategoryFlags() const override {return category;}
 	
@@ -36,7 +37,7 @@ namespace Hazel
 	{
 		friend class EventDispatcher;
 	public:
-		virtual EventType GetEventType() const = 0;//»ñÈ¡EventµÄÀàĞÍ£¬ÒòÎªEventÎª»ùÀà£¬Í¨¹ı»ùÀàÖ¸ÕëÒıÓÃµÄEventĞèÒªÅĞ¶ÏEventÀàĞÍ
+		virtual EventType GetEventType() const = 0;//è·å–Eventçš„ç±»å‹ï¼Œå› ä¸ºEventä¸ºåŸºç±»ï¼Œé€šè¿‡åŸºç±»æŒ‡é’ˆå¼•ç”¨çš„Eventéœ€è¦åˆ¤æ–­Eventç±»å‹
 		virtual const char* GetName() const = 0;
 		virtual int GetCategoryFlags() const = 0;
 		virtual std::string ToString() const { return GetName(); };
