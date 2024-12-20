@@ -71,4 +71,9 @@ namespace Hazel
 	private:
 		Event& m_Event;
 	};
+
+	inline std::ostream& operator<<(std::ostream& os, Event& e)
+	{
+		return os << e.ToString();
+	}
 }
